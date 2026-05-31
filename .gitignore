@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Dropbox
+.dropbox
+.dropbox.attr
+*.sb-*
+* (競合コピー *).*
+*conflicted copy*
+
+# エディタ / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# ログ・一時ファイル
+*.log
+tmp/
