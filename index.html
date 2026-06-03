@@ -43,20 +43,20 @@
   .story{text-align:center; font-size:15px; font-weight:700; color:#7a6ba0; min-height:20px; margin-bottom:4px;}
   .problem{font-family:'Mochiy Pop One',sans-serif; text-align:center; font-size:34px; color:var(--ink); margin-bottom:10px;}
   .instr{text-align:center; font-size:13px; font-weight:800; color:var(--orange); margin-bottom:12px; min-height:18px; line-height:1.5;}
-  .beaker-area{display:flex; justify-content:center; align-items:flex-end; gap:12px; margin-bottom:8px;}
-  .beaker{position:relative; width:54px; height:140px;}
+  .beaker-area{display:flex; justify-content:center; align-items:flex-end; gap:14px; margin-top:42px; margin-bottom:8px;}
+  .beaker{position:relative; width:58px; height:140px;}
   .glass{position:absolute; inset:0; border:3px solid var(--ink); border-top:none; border-radius:6px 6px 16px 16px; background:rgba(255,255,255,.5); overflow:hidden;}
   .liquid{position:absolute; left:0; right:0; bottom:0; background:linear-gradient(180deg,var(--juice),var(--juice2)); transition:height .2s ease;}
   .liquid.isrem{background:linear-gradient(180deg,#c89bf0,var(--rem));}
   .ticks{position:absolute; inset:0; pointer-events:none;}
   .tick{position:absolute; left:0; width:6px; height:1px; background:rgba(42,26,74,.3);}
-  .blabel{position:absolute; bottom:-22px; left:0; right:0; text-align:center; font-size:11px; font-weight:800;}
-  .bval{position:absolute; top:-22px; left:0; right:0; text-align:center; font-size:13px; font-weight:800; color:var(--juice2);}
+  .blabel{position:absolute; bottom:-24px; left:-8px; right:-8px; text-align:center; font-size:12px; font-weight:800; white-space:nowrap;}
+  .bval{position:absolute; top:-28px; left:-8px; right:-8px; text-align:center; font-size:18px; font-weight:800; color:var(--juice2); white-space:nowrap;}
   .bval.isrem{color:var(--rem);}
   .beaker-ctrl{display:flex; justify-content:center; gap:8px; margin:28px 0 8px; flex-wrap:wrap; align-items:flex-start;}
   .slider-row{display:flex; flex-direction:column; align-items:center; gap:4px; width:58px;}
   .slider-row .who{font-size:11px; font-weight:800; color:#7a6ba0;}
-  .slider-row .sval{font-size:13px; font-weight:800; color:var(--juice2);}
+  .slider-row .sval{font-size:15px; font-weight:800; color:var(--juice2);}
   input[type=range].vslider{ -webkit-appearance:none; appearance:none; writing-mode:vertical-lr; direction:rtl; width:30px; height:120px; background:transparent; cursor:pointer;}
   input[type=range].vslider::-webkit-slider-runnable-track{ width:14px; background:#e7e0f5; border:3px solid var(--ink); border-radius:20px;}
   input[type=range].vslider::-moz-range-track{ width:14px; background:#e7e0f5; border:3px solid var(--ink); border-radius:20px;}
@@ -67,7 +67,7 @@
   input[type=range].hslider::-moz-range-track{ height:14px; background:#e7e0f5; border:3px solid var(--ink); border-radius:20px;}
   input[type=range].hslider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:26px; height:26px; background:var(--cyan); border:3px solid var(--ink); border-radius:8px; box-shadow:0 2px 0 var(--ink); margin-top:-9px;}
   input[type=range].hslider::-moz-range-thumb{ width:26px; height:26px; background:var(--cyan); border:3px solid var(--ink); border-radius:8px;}
-  .calc-box{font-family:'Mochiy Pop One',sans-serif; display:flex; justify-content:center; margin:6px 0 10px;}
+  .calc-box{font-family:'Mochiy Pop One',sans-serif; display:flex; flex-direction:column; align-items:center; margin:6px 0 10px;}
   .ld{display:inline-grid; row-gap:2px; font-size:24px;}
   .ld .r{display:flex; align-items:center; height:32px;}
   .cellnum{width:28px; text-align:center;}
@@ -78,7 +78,7 @@
   .filledcell{color:#149a52;}
   .qline{border-bottom:3px solid var(--ink); padding-bottom:2px;}
   .divisor{font-size:22px; margin-right:4px;} .bracket{font-size:32px; line-height:28px; margin-right:2px;}
-  .steplist{max-width:430px; margin:4px auto 0;}
+  .steplist{max-width:430px; width:100%; margin:10px auto 0;}
   .stepline{display:flex; align-items:flex-start; gap:8px; background:#f3eeff; border-radius:10px; padding:7px 10px; margin-top:6px; font-family:'M PLUS Rounded 1c'; font-size:13px; font-weight:700; text-align:left; line-height:1.5;}
   .stepline .sn{flex:none; width:20px; height:20px; border-radius:50%; background:var(--cyan); color:#fff; text-align:center; line-height:20px; font-size:12px;}
   .stepline .se b{color:#149a52; font-size:15px;}
@@ -421,8 +421,8 @@
     $('story').textContent='もとの 数（？）は いくつだったかな？';
     var b=current.b, ans=current.ans, rem=current.rem||0, a=current.a;
     if(current.hasRem){
-      $('instr').innerHTML='まず かけ算をして、あまりを たそう！';
-      $('checkVisual').innerHTML='<div class="mainmul"><span class="cf">'+ans+'</span> <span class="op">×</span> '+b+' <span class="op">＝</span> ?</div><div class="formula">そのあと ＋ あまり <span class="cr">'+rem+'</span> で もとの数？</div>';
+      $('instr').innerHTML='かけ算して、あまりを たすと もとの数！';
+      $('checkVisual').innerHTML='<div class="mainmul" style="font-size:34px;"><span class="cf">'+ans+'</span> <span class="op">×</span> '+b+' <span class="op">＋</span> <span class="cr">'+rem+'</span> <span class="op">＝</span> ?</div><div class="formula">商 × わる数 <span class="cr">＋ あまり '+rem+'</span> ＝ もとの数？</div>';
     } else {
       $('instr').innerHTML='かけ算をして、もとの数に もどるか たしかめよう！';
       $('checkVisual').innerHTML='<div class="formula">商 × わる数 ＝ もと？</div><div class="mainmul"><span class="cf">'+ans+'</span> <span class="op">×</span> '+b+' <span class="op">＝</span> ?</div>';
