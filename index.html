@@ -187,10 +187,13 @@
   var TOTAL_Q=10, TIME_LIMIT=30, REM_COUNT=3;
   var STAGE_NAMES=['🧪 小数 ÷ 整数 ラボ','📏 整数 ÷ 小数 ラボ','🥤 小数 ÷ 小数 ラボ'];
   var mode=0, qIndex=0, combo=0, maxCombo=0, rightCount=0;
-  var startTime=0, qTimer=null, qTimeLeft=TIME_LIMIT, current=null, phase='beaker', explodeTimer=null;
+  var startTime=0, qTimer=null, qTimeLeft=TIME_LIMIT, current=null, phase='beaker', inGame=false, timers=[];
   var beakerVals=[], srcRemain=0, calcState=null, dead=false, remSchedule=[], qPlan=[], missedThisQ=false;
 
   function $(id){return document.getElementById(id);}
+  // 画面遷移用の setTimeout を一括管理（ホーム遷移・連打でも取り残さない）
+  function wait(fn,ms){ var id=setTimeout(function(){ timers=timers.filter(function(t){return t!==id;}); fn(); },ms); timers.push(id); return id; }
+  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
   function show(id){['home','game','result'].forEach(function(x){$(x).classList.toggle('hidden',x!==id);});}
   function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
   function pick(a){return a[Math.floor(Math.random()*a.length)];}
@@ -345,7 +348,7 @@
       else { msg='元を つかいきろう（いま '+cupCount+'コ）'; }
     }
     var fb=$('fb');
-    if(ok){ fb.innerHTML=msg; fb.style.color='#149a52'; $('checkBeaker').disabled=true; setTimeout(goCalc,900); }
+    if(ok){ fb.innerHTML=msg; fb.style.color='#149a52'; $('checkBeaker').disabled=true; wait(goCalc,900); }
     else { fb.innerHTML=msg; fb.style.color='#c23b3b'; var box=$('wrap'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake'); }
   }
 
@@ -394,12 +397,12 @@
   function pickDigit(v,btn,correct){
     if(dead)return;
     if(v===correct){ btn.classList.add('right'); calcState.stepIdx++;
-      if(calcState.stepIdx>=calcState.ld.qd.length){ setTimeout(goCheck,700); }
-      else { $('fb').innerHTML='その位 せいかい！'; $('fb').style.color='#149a52'; setTimeout(renderLong,450); }
+      if(calcState.stepIdx>=calcState.ld.qd.length){ wait(goCheck,700); }
+      else { $('fb').innerHTML='その位 せいかい！'; $('fb').style.color='#149a52'; wait(renderLong,450); }
     } else { btn.classList.add('wrong'); missedThisQ=true; $('fb').innerHTML='この位は '+correct+' だよ'; $('fb').style.color='#c23b3b';
       var box=$('wrap'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
       [].forEach.call($('choices').children,function(c){if(parseInt(c.textContent)===correct)c.classList.add('right');});
-      setTimeout(function(){ calcState.stepIdx++; if(calcState.stepIdx>=calcState.ld.qd.length){ goCheck(); } else { renderLong(); } },750);
+      wait(function(){ calcState.stepIdx++; if(calcState.stepIdx>=calcState.ld.qd.length){ goCheck(); } else { renderLong(); } },750);
     }
   }
 
@@ -408,7 +411,7 @@
     $('calcBox').innerHTML='<div style="font-family:\'Mochiy Pop One\';text-align:center;line-height:2;"><div style="font-size:26px;">'+current.a+' ÷ '+current.b+'</div><div style="font-size:14px;color:#7a6ba0;">↓ 両方を 10ばい</div><div style="font-size:30px;color:var(--juice2);">'+tf.A+' ÷ '+tf.B+' = ?</div></div>';
     var correct=current.ans, opts=makeNumChoices(correct); var ch=$('choices'); ch.innerHTML='';
     opts.forEach(function(v){ var b=document.createElement('button'); b.className='choice'; b.textContent=v;
-      b.onclick=function(){ if(dead)return; if(v===correct){b.classList.add('right'); setTimeout(goCheck,700);} else {b.classList.add('wrong'); missedThisQ=true; [].forEach.call(ch.children,function(c){if(parseInt(c.textContent)===correct)c.classList.add('right');}); var bx=$('wrap');bx.classList.remove('shake');void bx.offsetWidth;bx.classList.add('shake'); setTimeout(goCheck,750);} };
+      b.onclick=function(){ if(dead)return; if(v===correct){b.classList.add('right'); wait(goCheck,700);} else {b.classList.add('wrong'); missedThisQ=true; [].forEach.call(ch.children,function(c){if(parseInt(c.textContent)===correct)c.classList.add('right');}); var bx=$('wrap');bx.classList.remove('shake');void bx.offsetWidth;bx.classList.add('shake'); wait(goCheck,750);} };
       ch.appendChild(b); });
     $('instr').innerHTML='整数の わり算は？';
   }
@@ -461,6 +464,7 @@
   function nextQuestion(){ qIndex++; $('progressbar').style.width=(qIndex/TOTAL_Q*100)+'%'; if(qIndex>=TOTAL_Q){ endGame(false); return; } loadQuestion(); }
 
   function startQTimer(limit){
+    if(!inGame) return; // ホームに戻った後などに裏でタイマーが復活しないように
     clearInterval(qTimer); qTimeLeft=limit; var danger=Math.max(5,limit/3);
     $('timeN').textContent=qTimeLeft.toFixed(1); $('timePill').classList.remove('danger');
     qTimer=setInterval(function(){ qTimeLeft-=0.1; if(qTimeLeft<=danger)$('timePill').classList.add('danger');
@@ -490,7 +494,7 @@
       var ang=Math.random()*Math.PI*2, dist=120+Math.random()*220;
       f.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:1},{transform:'translate('+(Math.cos(ang)*dist)+'px,'+(Math.sin(ang)*dist)+'px) scale(1.4)',opacity:0}],{duration:700+Math.random()*300,easing:'ease-out',fill:'forwards'}); })(); }
     $('wrap').classList.add('blown');
-    explodeTimer=setTimeout(function(){ if(boom.parentNode)boom.parentNode.removeChild(boom); document.querySelectorAll('.frag').forEach(function(f){f.remove();}); $('wrap').classList.remove('blown'); dead=false; reloadSameQuestion(); },1200);
+    wait(function(){ if(boom.parentNode)boom.parentNode.removeChild(boom); document.querySelectorAll('.frag').forEach(function(f){f.remove();}); $('wrap').classList.remove('blown'); dead=false; reloadSameQuestion(); },1200);
   }
 
   // 同じ問題を最初（ビーカー）からやり直し
@@ -540,6 +544,7 @@
   }
 
   function startGame(m){
+    clearInterval(qTimer); clearTimers(); inGame=true;
     mode=m; qIndex=0; combo=0; maxCombo=0; rightCount=0; dead=false;
     $('comboN').textContent=0; $('progressbar').style.width='0%';
     buildPlan();
@@ -547,7 +552,7 @@
   }
 
   function endGame(byBoom){
-    clearInterval(qTimer);
+    inGame=false; clearInterval(qTimer); clearTimers();
     var total=Math.round((Date.now()-startTime)/100)/10;
     $('resultEmoji').textContent= byBoom?'💥':'🏆';
     $('resultTitle').textContent= byBoom?'タイムアップ！':'ぜんぶクリア！';
@@ -558,7 +563,7 @@
   }
 
   function goHome(){
-    clearInterval(qTimer); clearTimeout(explodeTimer); dead=false;
+    inGame=false; clearInterval(qTimer); clearTimers(); dead=false;
     document.querySelectorAll('#boom,.frag').forEach(function(f){f.remove();});
     $('wrap').classList.remove('blown');
     show('home');
