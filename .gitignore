@@ -21,3 +21,7 @@ Icon?
 # ログ・一時ファイル
 *.log
 tmp/
+
+# 非公開のマニュアル（ローカルには残すが公開しない）
+manual.md
+manual.pdf
