@@ -209,7 +209,7 @@
   // 余りなし候補（小数÷整数）
   var MODE0=[]; for(var b=2;b<=5;b++){ for(var Q10=11;Q10<=25;Q10++){ var a10=Q10*b; if(a10%10!==0 && a10<=100){ MODE0.push({b:b,Q10:Q10}); } } }
   // 余りあり候補（小数÷整数）
-  var MODE0R=[]; for(var b2=2;b2<=5;b2++){ for(var Q=11;Q<=25;Q++){ for(var r=1;r<b2;r++){ var aa=Q*b2+r; if(aa<=100){ MODE0R.push({b:b2,Q10:Q,rem10:r}); } } } }
+  var MODE0R=[]; for(var b2=2;b2<=5;b2++){ for(var Q=11;Q<=25;Q++){ for(var r=1;r<b2;r++){ var aa=Q*b2+r; if(aa%10!==0 && aa<=100){ MODE0R.push({b:b2,Q10:Q,rem10:r}); } } } }
 
   function gen(m, withRem, forceB){
     var o={mode:m, hasRem:!!withRem};
